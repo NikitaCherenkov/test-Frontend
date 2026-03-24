@@ -272,6 +272,14 @@ export default function CustomerLotsPage() {
               {customer && (
                 <Badge label={`${customer.code}`} size="m" status="normal" />
               )}
+              {customer && (
+                <Button
+                  label="← Редактировать"
+                  view="secondary"
+                  form="round"
+                  onClick={() => navigate(`/customers/${customerId}`)}
+                />
+              )}
             </div>
             {customer && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24 }}>
