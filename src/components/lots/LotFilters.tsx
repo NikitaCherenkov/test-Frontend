@@ -130,53 +130,55 @@ export default function LotFilters({
             </div>
 
             {/* Отображение выбранных фильтров в виде тегов */}
-            {((selectedCurrencies && selectedCurrencies.length > 0) || (selectedNdsRates && selectedNdsRates.length > 0)) || search && (
-                <div style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: 8,
-                    marginTop: 16,
-                    paddingTop: 16,
-                    borderTop: '1px solid var(--border)'
-                }}>
-                    <Text size="xs" view="ghost" style={{ marginRight: 8 }}>
-                        Фильтры:
-                    </Text>
-                    {selectedCurrencies && selectedCurrencies.map(currency => (
-                        <Tag
-                            key={currency.value}
-                            label={`Валюта: ${currency.label}`}
-                            size="s"
-                            mode="cancel"
-                            onCancel={() => {
-                                onCurrenciesChange(selectedCurrencies.filter(c => c.value !== currency.value))
-                            }}
-                        />
-                    ))}
-                    {selectedNdsRates && selectedNdsRates.map(nds => (
-                        <Tag
-                            key={nds.value}
-                            label={`НДС: ${nds.label}`}
-                            size="s"
-                            mode="cancel"
-                            onCancel={() => {
-                                onNdsRatesChange(selectedNdsRates.filter(n => n.value !== nds.value))
-                            }}
-                        />
-                    ))}
-                    {search && (
-                        <Tag
-                            label={`Поиск: ${search}`}
-                            size="s"
-                            mode="cancel"
-                            onCancel={() => {
-                                setSearchValue('')
-                                onSearchChange('')
-                            }}
-                        />
-                    )}
-                </div>
-            )}
+            {((selectedCurrencies && selectedCurrencies.length > 0) ||
+                (selectedNdsRates && selectedNdsRates.length > 0) ||
+                (search && search.trim() !== '')) && (
+                    <div style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: 8,
+                        marginTop: 16,
+                        paddingTop: 16,
+                        borderTop: '1px solid var(--border)'
+                    }}>
+                        <Text size="xs" view="ghost" style={{ marginRight: 8 }}>
+                            Фильтры:
+                        </Text>
+                        {selectedCurrencies && selectedCurrencies.map(currency => (
+                            <Tag
+                                key={currency.value}
+                                label={`Валюта: ${currency.label}`}
+                                size="s"
+                                mode="cancel"
+                                onCancel={() => {
+                                    onCurrenciesChange(selectedCurrencies.filter(c => c.value !== currency.value))
+                                }}
+                            />
+                        ))}
+                        {selectedNdsRates && selectedNdsRates.map(nds => (
+                            <Tag
+                                key={nds.value}
+                                label={`НДС: ${nds.label}`}
+                                size="s"
+                                mode="cancel"
+                                onCancel={() => {
+                                    onNdsRatesChange(selectedNdsRates.filter(n => n.value !== nds.value))
+                                }}
+                            />
+                        ))}
+                        {search && (
+                            <Tag
+                                label={`Поиск: ${search}`}
+                                size="s"
+                                mode="cancel"
+                                onCancel={() => {
+                                    setSearchValue('')
+                                    onSearchChange('')
+                                }}
+                            />
+                        )}
+                    </div>
+                )}
         </Card>
     )
 }
