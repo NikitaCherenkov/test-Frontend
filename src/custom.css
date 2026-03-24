@@ -1,0 +1,8 @@
+.button-rounded {
+    border-radius: 30px;
+}
+
+.button-delete {
+    color: '#ff4d4f';
+    border-color: '#ff0000'
+}
