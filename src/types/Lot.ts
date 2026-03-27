@@ -1,6 +1,6 @@
 export interface Lot {
   id: number
-  name: string
+  lotName: string
   customerCode?: string
   price: number
   currencyCode: string

@@ -74,15 +74,15 @@ export default function CustomerDrawer({
       const response = await customerApi.getById(customerId)
       const customer = response.data
 
-      setCode(customer.code || '')
-      setName(customer.name || '')
+      setCode(customer.customerCode || '')
+      setName(customer.customerName || '')
       setCustomerType(customer.customerType)
-      setInn(customer.inn || '')
-      setKpp(customer.kpp || '')
-      setLegalAddress(customer.legalAddress || '')
-      setPostalAddress(customer.postalAddress || '')
-      setEmail(customer.email || '')
-      setCodeMainCustomer(customer.codeMainCustomer || undefined)
+      setInn(customer.customerInn || '')
+      setKpp(customer.customerKpp || '')
+      setLegalAddress(customer.customerLegalAddress || '')
+      setPostalAddress(customer.customerPostalAddress || '')
+      setEmail(customer.customerEmail || '')
+      setCodeMainCustomer(customer.customerCodeMain || undefined)
     } catch (error) {
       console.error('Load customer error:', error)
       showError('Ошибка загрузки контрагента')
@@ -100,8 +100,8 @@ export default function CustomerDrawer({
       ...res.data
         .filter(c => customerId ? c.id !== customerId : true)
         .map(c => ({
-          label: `${c.name} (${c.code})`,
-          value: c.code
+          label: `${c.customerName} (${c.customerCode})`,
+          value: c.customerCode
         }))
       ]
       console.log('parentOptions:', options)
@@ -143,15 +143,15 @@ export default function CustomerDrawer({
       if (!isFormValid()) return
 
       const data: Partial<Customer> = {
-        code,
-        name,
+        customerCode: code,
+        customerName: name,
         customerType,
-        inn,
-        kpp: customerType === 'ORGANIZATION' ? kpp : undefined,
-        legalAddress: legalAddress ? legalAddress : undefined,
-        postalAddress: postalAddress ? postalAddress : undefined,
-        email: email ? email : undefined,
-        codeMainCustomer: codeMainCustomer || undefined
+        customerInn: inn,
+        customerKpp: customerType === 'ORGANIZATION' ? kpp : undefined,
+        customerLegalAddress: legalAddress ? legalAddress : undefined,
+        customerPostalAddress: postalAddress ? postalAddress : undefined,
+        customerEmail: email ? email : undefined,
+        customerCodeMain: codeMainCustomer || undefined
       }
 
       if (customerId) {
@@ -185,12 +185,12 @@ export default function CustomerDrawer({
   }
 
   const selectedParent = codeMainCustomer
-    ? allCustomers.find(c => c.code === codeMainCustomer)
+    ? allCustomers.find(c => c.customerCode === codeMainCustomer)
     : null
 
   const selectValue = codeMainCustomer && selectedParent
     ? {
-      label: `${selectedParent.name} (${selectedParent.code})`,
+      label: `${selectedParent.customerName} (${selectedParent.customerCode})`,
       value: codeMainCustomer
     }
     : null
@@ -235,6 +235,7 @@ export default function CustomerDrawer({
                 status="system"
               />
             )}
+            {customerId && (
             <Button
               view="secondary"
               size="m"
@@ -242,6 +243,7 @@ export default function CustomerDrawer({
               label="📦 Перейти к лотам →"
               onClick={handleGoToLots}
             />
+            )}
           </div>
           <Button
             view="clear"

@@ -33,9 +33,9 @@ export default function CustomersPage() {
 
     const filteredCustomers = allCustomers.filter(customer => {
         const matchesSearch =
-            customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            customer.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            customer.inn.includes(searchTerm)
+            customer.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            customer.customerCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            customer.customerInn.includes(searchTerm)
 
         const matchesType =
             selectedCustomerType === 'ALL' ||
@@ -173,15 +173,15 @@ export default function CustomersPage() {
 
         const headers = ['Код', 'Наименование', 'ИНН', 'КПП', 'Тип', 'Юр. адрес', 'Почт. адрес', 'Email', 'Вышестоящий']
         const rows = selectedCustomers.map(c => [
-            c.code,
-            c.name,
-            c.inn,
-            c.kpp || '',
+            c.customerCode,
+            c.customerName,
+            c.customerInn,
+            c.customerKpp || '',
             c.customerType === 'ORGANIZATION' ? 'Юр. лицо' : 'Физ. лицо',
-            c.legalAddress || '',
-            c.postalAddress || '',
-            c.email || '',
-            allCustomers.find(p => p.code === c.codeMainCustomer)?.name || ''
+            c.customerLegalAddress || '',
+            c.customerPostalAddress || '',
+            c.customerEmail || '',
+            allCustomers.find(p => p.customerCode === c.customerCodeMain)?.customerName || ''
         ])
 
         const csvContent = [
@@ -204,11 +204,11 @@ export default function CustomersPage() {
     }
 
     const columns: Column<Customer>[] = [
-        { title: 'Код', field: 'code', minWidth: '100', flex: 1 },
-        { title: 'Наименование', field: 'name', flex: 2 },
-        { title: 'ИНН', field: 'inn', minWidth: '120', flex: 1 },
+        { title: 'Код', field: 'customerCode', minWidth: '100', flex: 1 },
+        { title: 'Наименование', field: 'customerName', flex: 2 },
+        { title: 'ИНН', field: 'customerInn', minWidth: '120', flex: 1 },
         { title: 'Тип лица', field: 'customerType', minWidth: '100', flex: 1 },
-        { title: 'Вышестоящий', field: 'codeMainCustomer', flex: 1.5 }
+        { title: 'Вышестоящий', field: 'customerCodeMain', flex: 1.5 }
     ]
 
     return (

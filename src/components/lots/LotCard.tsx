@@ -9,6 +9,7 @@ import type { Lot } from '../../types/Lot';
 import { DataTableRow } from '../DataTableRow';
 import type { Column } from '../DataTable';
 import { useNotifications } from '../../context/NotificationContext'
+import { format } from 'date-fns'
 
 type Props = {
     lot: Lot;
@@ -65,7 +66,7 @@ export default function LotCard({
     const { showSuccess, showError } = useNotifications()
 
     const [editData, setEditData] = useState({
-        name: lot.name,
+        name: lot.lotName,
         price: lot.price,
         currencyCode: lot.currencyCode,
         ndsRate: normalizeNdsRate(lot.ndsRate),
@@ -91,16 +92,21 @@ export default function LotCard({
         setEditData(prev => ({ ...prev, [field]: value }));
     };
 
+    const formatDateForApi = (date: Date | null): string => {
+        if (!date) return ''
+        return format(date, 'yyyy-MM-dd')
+    }
+
     const saveChanges = async () => {
         setLoading(true);
         try {
             await onUpdate(lot.id, {
-                name: editData.name,
+                lotName: editData.name,
                 price: editData.price,
                 currencyCode: editData.currencyCode,
                 ndsRate: editData.ndsRate,
                 placeDelivery: editData.placeDelivery,
-                dateDelivery: editData.dateDelivery ? editData.dateDelivery.toISOString().split('T')[0] : ''
+                dateDelivery: editData.dateDelivery ? formatDateForApi(editData.dateDelivery) : ''
             });
             setIsEditing(false);
             showSuccess('Изменения успешно сохранены');
@@ -115,7 +121,7 @@ export default function LotCard({
     const cancelEditing = () => {
         setIsEditing(false);
         setEditData({
-            name: lot.name,
+            name: lot.lotName,
             price: lot.price,
             currencyCode: lot.currencyCode,
             ndsRate: normalizeNdsRate(lot.ndsRate),
@@ -129,7 +135,7 @@ export default function LotCard({
         const selectedNds = ndsOptions.find(n => n.value === editData.ndsRate);
 
         switch (field) {
-            case 'name':
+            case 'lotName':
                 return (
                     <TextField
                         size="s"
@@ -203,8 +209,8 @@ export default function LotCard({
 
     const renderCell = (field: keyof Lot) => {
         switch (field) {
-            case 'name':
-                return <Text size="s" weight="medium">{lot.name || '—'}</Text>;
+            case 'lotName':
+                return <Text size="s" weight="medium">{lot.lotName || '—'}</Text>;
             case 'price':
                 return <Text size="s">{formatPrice(lot.price)}</Text>;
             case 'currencyCode':
@@ -252,7 +258,7 @@ export default function LotCard({
                     ))
                 ) : (
                     <>
-                        <div style={{ flex: 2, marginRight: 16 }}>{renderEditField('name')}</div>
+                        <div style={{ flex: 2, marginRight: 16 }}>{renderEditField('lotName')}</div>
                         <div style={{ minWidth: 120, marginRight: 16 }}>{renderEditField('price')}</div>
                         <div style={{ minWidth: 80, marginRight: 16 }}>{renderEditField('currencyCode')}</div>
                         <div style={{ minWidth: 100, marginRight: 16 }}>{renderEditField('ndsRate')}</div>
@@ -314,7 +320,7 @@ export default function LotCard({
                 ))
             ) : (
                 <>
-                    <div style={{ flex: 2, marginRight: 16 }}>{renderCell('name')}</div>
+                    <div style={{ flex: 2, marginRight: 16 }}>{renderCell('lotName')}</div>
                     <div style={{ minWidth: 120, marginRight: 16 }}>{renderCell('price')}</div>
                     <div style={{ minWidth: 80, marginRight: 16 }}>{renderCell('currencyCode')}</div>
                     <div style={{ minWidth: 100, marginRight: 16 }}>{renderCell('ndsRate')}</div>

@@ -79,7 +79,7 @@ export default function CustomerLotsPage() {
   }, [customer])
 
   const isLotDataValid = (lot: Lot): boolean => {
-    if (!lot.name || lot.name.trim() === '') { showError('Введите наименование лота'); return false }
+    if (!lot.lotName || lot.lotName.trim() === '') { showError('Введите наименование лота'); return false }
     if (!lot.placeDelivery || lot.placeDelivery.trim() === '') { showError('Введите место доставки'); return false }
     if (lot.price == null || isNaN(lot.price) || lot.price < 0) { showError('Введите корректную цену'); return false }
     if (!lot.currencyCode) { showError('Выберите валюту'); return false }
@@ -125,7 +125,7 @@ export default function CustomerLotsPage() {
   const filteredLots = useMemo(() => {
     return allLots.filter((lot) => {
       const bySearch =
-        !search || lot.name.toLowerCase().includes(search.toLowerCase())
+        !search || lot.lotName.toLowerCase().includes(search.toLowerCase())
 
       const byCurrency = selectedCurrencies.length === 0 ||
         selectedCurrencies.some(curr => curr.value === lot.currencyCode)
@@ -206,7 +206,7 @@ export default function CustomerLotsPage() {
 
     const headers = ['Наименование', 'Код контрагента', 'Стоимость', 'Валюта', 'НДС', 'Грузополучатель', 'Дата поставки']
     const rows = selectedLots.map(l => [
-      l.name,
+      l.lotName,
       l.customerCode,
       l.price,
       l.currencyCode,
@@ -224,7 +224,7 @@ export default function CustomerLotsPage() {
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
-    link.setAttribute('download', `лоты_контрагента_${customer?.code}_${new Date().toISOString().split('T')[0]}.csv`)
+    link.setAttribute('download', `лоты_контрагента_${customer?.customerCode}_${new Date().toISOString().split('T')[0]}.csv`)
     link.style.visibility = 'hidden'
     document.body.appendChild(link)
     link.click()
@@ -244,7 +244,7 @@ export default function CustomerLotsPage() {
   const activeFiltersCount = (selectedCurrencies?.length || 0) + (selectedNdsRates?.length || 0) + (search ? 1 : 0)
 
   const columns: Column<Lot>[] = [
-    { title: 'Наименование лота', field: 'name', flex: 2 },
+    { title: 'Наименование лота', field: 'lotName', flex: 2 },
     { title: 'Стоимость', field: 'price', minWidth: '120', flex: 1, align: 'right' },
     { title: 'Валюта', field: 'currencyCode', minWidth: '80', flex: 0.5 },
     { title: 'НДС', field: 'ndsRate', minWidth: '100', flex: 0.8 },
@@ -267,10 +267,10 @@ export default function CustomerLotsPage() {
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
               <Text as="h2" size="xl" weight="bold" style={{ margin: 0 }}>
-                {customer ? customer.name : 'Контрагент не найден'}
+                {customer ? customer.customerName : 'Контрагент не найден'}
               </Text>
               {customer && (
-                <Badge label={`${customer.code}`} size="m" status="normal" />
+                <Badge label={`${customer.customerCode}`} size="m" status="normal" />
               )}
               {customer && (
                 <Button
@@ -284,15 +284,15 @@ export default function CustomerLotsPage() {
             {customer && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24 }}>
                 <div>
-                  <Text size="s" weight="light">🏢 ИНН {customer.inn || '—'}</Text>
+                  <Text size="s" weight="light">🏢 ИНН {customer.customerInn || '—'}</Text>
                 </div>
                 {customer.customerType === 'ORGANIZATION' && (
                   <div>
-                    <Text size="s" weight="light">📍 КПП {customer.kpp || '—'}</Text>
+                    <Text size="s" weight="light">📍 КПП {customer.customerKpp || '—'}</Text>
                   </div>
                 )}
                 <div>
-                  <Text size="s" weight="light">📧 {customer.email || '—'}</Text>
+                  <Text size="s" weight="light">📧 {customer.customerEmail || '—'}</Text>
                 </div>
               </div>
             )}

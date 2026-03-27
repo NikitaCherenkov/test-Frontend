@@ -10,6 +10,7 @@ import type { Customer } from '../../types/Customer'
 import { lotApi } from '../../api/LotApi'
 import { customerApi } from '../../api/CustomerApi'
 import { useNotifications } from '../../context/NotificationContext'
+import { format } from 'date-fns'
 
 type Props = {
   open: boolean
@@ -26,7 +27,6 @@ type CurrencyOption = {
 
 type NdsOption = {
   label: string
-  value: string
 }
 
 const currencyOptions: CurrencyOption[] = [
@@ -36,25 +36,10 @@ const currencyOptions: CurrencyOption[] = [
 ]
 
 const ndsOptions: NdsOption[] = [
-  { label: 'Без НДС', value: 'NDS_0' },
-  { label: '18%', value: 'NDS_18' },
-  { label: '20%', value: 'NDS_20' }
+  { label: 'Без НДС' },
+  { label: '18%' },
+  { label: '20%' }
 ]
-
-const convertBackendNdsToFrontend = (backendNds: string): string => {
-  if (!backendNds) return 'NDS_20'
-
-  if (backendNds === 'NDS_0' || backendNds === 'NDS_18' || backendNds === 'NDS_20') {
-    return backendNds
-  }
-
-  const normalized = backendNds.trim()
-  if (normalized === 'Без НДС') return 'NDS_0'
-  if (normalized === '18%') return 'NDS_18'
-  if (normalized === '20%') return 'NDS_20'
-
-  return 'NDS_20'
-}
 
 export default function LotDrawer({
   open,
@@ -63,11 +48,11 @@ export default function LotDrawer({
   onClose,
   reload
 }: Props) {
-  const [name, setName] = useState('')
+  const [lotName, setName] = useState('')
   const [customerCode, setCustomerCode] = useState('')
   const [price, setPrice] = useState('')
-  const [currencyCode, setCurrency] = useState('RUB')
-  const [ndsRate, setNds] = useState('NDS_20')
+  const [currencyCode, setCurrency] = useState('')
+  const [ndsRate, setNds] = useState('')
   const [placeDelivery, setPlaceDelivery] = useState('')
   const [dateDelivery, setDateDelivery] = useState<Date | null>(null)
   const [loading, setLoading] = useState(false)
@@ -102,7 +87,7 @@ export default function LotDrawer({
     if (!customerId) return
     try {
       const response = await customerApi.getById(customerId)
-      setCustomerCode(response.data.code)
+      setCustomerCode(response.data.customerCode)
     } catch (error) {
       console.error('Load customer error:', error)
       showError('Ошибка загрузки контрагента')
@@ -117,11 +102,11 @@ export default function LotDrawer({
       const response = await lotApi.getById(lotId)
       const lot = response.data
 
-      setName(lot.name || '')
+      setName(lot.lotName || '')
       setCustomerCode(lot.customerCode || '')
       setPrice(String(lot.price || ''))
       setCurrency(lot.currencyCode || 'RUB')
-      setNds(convertBackendNdsToFrontend(lot.ndsRate))
+      setNds(lot.ndsRate)
       setPlaceDelivery(lot.placeDelivery || '')
 
       if (lot.dateDelivery) {
@@ -144,8 +129,8 @@ export default function LotDrawer({
       setAllCustomers(res.data)
 
       const options = res.data.map(c => ({
-        label: `${c.code} - ${c.name}`,
-        value: c.code
+        label: `${c.customerCode} - ${c.customerName}`,
+        value: c.customerCode
       }))
       setCustomerOptions(options)
     } catch (error) {
@@ -171,7 +156,7 @@ export default function LotDrawer({
   }
 
   const isFormValid = () => {
-    if (!name.trim()) { showError('Введите наименование лота'); return false }
+    if (!lotName.trim()) { showError('Введите наименование лота'); return false }
     if (!isCustomerSpecific && !customerCode) { showError('Выберите контрагента'); return false }
     if (!placeDelivery.trim()) { showError('Введите место доставки'); return false }
     if (!price || isNaN(Number(price)) || Number(price) < 0) { showError('Введите корректную цену'); return false }
@@ -181,18 +166,23 @@ export default function LotDrawer({
     return true
   }
 
+  const formatDateForApi = (date: Date | null): string => {
+    if (!date) return ''
+    return format(date, 'yyyy-MM-dd')
+  }
+
   const handleSave = async () => {
     if (!isFormValid()) return
 
     try {
       const data = {
-        name,
+        lotName: lotName,
         customerCode: customerCode || undefined,
         price: Number(price),
         currencyCode,
         ndsRate,
         placeDelivery,
-        dateDelivery: dateDelivery ? dateDelivery.toISOString().split('T')[0] : ''
+        dateDelivery: dateDelivery ? formatDateForApi(dateDelivery) : ''
       }
 
       if (lotId) {
@@ -228,12 +218,12 @@ export default function LotDrawer({
   }
 
   const selectedCurrency = currencyOptions.find(c => c.value === currencyCode)
-  const selectedNds = ndsOptions.find(n => n.value === ndsRate)
+  const selectedNds = ndsOptions.find(n => n.label === ndsRate)
 
-  const selectedCustomer = allCustomers.find(c => c.code === customerCode)
+  const selectedCustomer = allCustomers.find(c => c.customerCode === customerCode)
   const selectValue = customerCode && selectedCustomer
     ? {
-      label: `${selectedCustomer.code} - ${selectedCustomer.name}`,
+      label: `${selectedCustomer.customerCode} - ${selectedCustomer.customerName}`,
       value: customerCode
     }
     : null
@@ -289,7 +279,7 @@ export default function LotDrawer({
           <div style={{ marginBottom: 16 }}>
             <TextField
               label="Наименование"
-              value={name}
+              value={lotName}
               onChange={(value) => setName(value || '')}
               required
               placeholder="Введите наименование лота"
@@ -400,9 +390,9 @@ export default function LotDrawer({
               label="Ставка НДС"
               items={ndsOptions}
               value={selectedNds}
-              onChange={(value) => setNds(value?.value || 'NDS_20')}
+              onChange={(value) => setNds(value?.label || ndsRate)}
               required
-              getItemKey={(item) => item.value}
+              getItemKey={(item) => item.label}
               placeholder='Выберите ставку НДС'
             />
           </div>

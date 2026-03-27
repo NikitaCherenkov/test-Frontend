@@ -24,8 +24,8 @@ export default function CustomerCard({
 }: Props) {
   const navigate = useNavigate();
 
-  const parentCustomer = customer.codeMainCustomer
-    ? allCustomers.find(c => c.code === customer.codeMainCustomer)
+  const parentCustomer = customer.customerCodeMain
+    ? allCustomers.find(c => c.customerCode === customer.customerCodeMain)
     : undefined;
 
   const handleGoToLots = () => {
@@ -34,12 +34,12 @@ export default function CustomerCard({
 
   const getCellValue = (field: keyof Customer): React.ReactNode => {
     switch (field) {
-      case 'code':
-        return <Text size="s" weight="bold">{customer.code}</Text>;
-      case 'name':
-        return <Text size="s" view="primary" weight="medium">{customer.name}</Text>;
-      case 'inn':
-        return <Text size="s">{customer.inn || '—'}</Text>;
+      case 'customerCode':
+        return <Text size="s" weight="bold">{customer.customerCode}</Text>;
+      case 'customerName':
+        return <Text size="s" view="primary" weight="medium">{customer.customerName}</Text>;
+      case 'customerInn':
+        return <Text size="s">{customer.customerInn || '—'}</Text>;
       case 'customerType':
         return (
           <Badge
@@ -48,8 +48,8 @@ export default function CustomerCard({
             status={customer.customerType === 'ORGANIZATION' ? 'system' : 'success'}
           />
         );
-      case 'codeMainCustomer':
-        return <Text size="s">{parentCustomer ? parentCustomer.name : '—'}</Text>;
+      case 'customerCodeMain':
+        return <Text size="s">{parentCustomer ? parentCustomer.customerName : '—'}</Text>;
       default:
         return <Text size="s">—</Text>;
     }

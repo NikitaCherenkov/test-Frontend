@@ -2,13 +2,13 @@ export type CustomerType = 'ORGANIZATION' | 'PERSON'
 
 export interface Customer {
   id: number
-  code: string
-  name: string
-  inn: string
-  kpp?: string
-  legalAddress?: string
-  postalAddress?: string
-  email?: string
-  codeMainCustomer?: string
+  customerCode: string
+  customerName: string
+  customerInn: string
+  customerKpp?: string
+  customerLegalAddress?: string
+  customerPostalAddress?: string
+  customerEmail?: string
+  customerCodeMain?: string
   customerType: CustomerType
 }
